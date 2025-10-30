@@ -35,21 +35,47 @@ products_df = pd.DataFrame(products_data, columns=["product_id", "product_name",
 sales_df = pd.DataFrame(sales_data, columns=["sale_id", "sale_date", "product_id", "quantity", "total_price"])
 
 # ======================
+# Expected Answers (normalized lowercase, stripped)
+# ======================
+
+answers = {
+    1: "select * from sales;",
+    2: "select product_name, unit_price from products;",
+    3: "select sale_id, sale_date from sales;",
+    4: "select * from sales where total_price > 100;",
+    5: "select * from products where category = 'electronics';",
+    6: "select sale_id, total_price from sales where sale_date = '2024-03-01';",
+    7: "select product_id, product_name from products where unit_price > 100;",
+    8: "select sum(total_price) from sales;",
+    9: "select avg(unit_price) from products;",
+    10: "select sum(quantity) from sales;",
+    11: "select sale_date, count(*) from sales group by sale_date;",
+    12: "select * from products order by unit_price desc limit 1;",
+    13: "select * from sales where quantity > 4;",
+    14: "select * from products order by unit_price desc;",
+    15: "select round(sum(total_price), 2) from sales;",
+    16: "select avg(total_price) from sales;",
+    17: "select date_format(sale_date, '%Y-%m-%d') from sales;",
+    18: "select sum(s.total_price) from sales s join products p on s.product_id = p.product_id where p.category = 'electronics';",
+    19: "select * from products where unit_price between 20 and 600;",
+    20: "select product_name, category from products order by category;"
+}
+
+# ======================
 # Streamlit Interface
 # ======================
 
 st.set_page_config(page_title="SQL Exercises", layout="wide")
-
 st.title("SQL Exercises – Products & Sales Dataset")
 
-st.subheader("📦 Table: Products")
+st.subheader("Table: Products")
 st.dataframe(products_df, use_container_width=True)
 
-st.subheader("💰 Table: Sales")
+st.subheader("Table: Sales")
 st.dataframe(sales_df, use_container_width=True)
 
 st.markdown("---")
-st.header("🧩 SQL Query Exercises")
+st.header("SQL Query Exercises")
 
 questions = [
     "1. Récupérez toutes les colonnes du tableau Sales.",
@@ -74,10 +100,14 @@ questions = [
     "20. Répertorier le nom du produit et la catégorie par ordre de catégorie."
 ]
 
-for q in questions:
+for i, q in enumerate(questions, start=1):
     st.markdown(f"**{q}**")
-    st.text_area("Votre réponse SQL :", key=q, height=80)
+    answer_input = st.text_area("Votre requête SQL :", key=f"q{i}", height=60)
+    if answer_input.strip().lower().replace(";", "") == answers[i].replace(";", ""):
+        st.success("✅ Correct")
+    else:
+        st.info("En attente ou incorrect")
 
 st.markdown("---")
-st.info("💡 Écrivez vos requêtes dans les zones de texte ci-dessus. Vous pouvez ensuite les tester dans un environnement SQL.")
+st.caption("Les réponses sont vérifiées automatiquement par comparaison textuelle simple.")
 
